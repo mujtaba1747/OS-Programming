@@ -1,7 +1,7 @@
 // Author : Syed Mujtaba
 // TE-11
 // Matrix Multplication using Threads
-// http://p.ip.fi/FObx
+// http://p.ip.fi/dKp2
 // Compile using gcc file.c -lpthread
 // Don't declare matrices of the likes of 1000 * 1000 if you don't want a segfault.
 #include <sys/types.h>
