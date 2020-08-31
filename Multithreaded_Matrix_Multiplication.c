@@ -56,7 +56,7 @@ int main()
 	printf("Enter choice of execution : \n1. Threads in parallel\n2. Single Thread\n");
 	int ch;
 	scanf("%d", &ch);
-	clock_t b = clock(); // Remove clock to remove Seg Error in case of huge size
+	clock_t b = clock(); // Remove clock to remove Seg Error in case of huge size (Works Sometimes !!)
 	if(ch == 2)
 	{
 		for(int i = 0; i < m; i++)
