@@ -2,6 +2,8 @@
 // Author : Syed Mujtaba 
 // TE - 11
 // Compile using gcc file.c -lpthread
+// http://p.ip.fi/RrAY
+// Refer : https://docs.oracle.com/cd/E19455-01/806-5257/sync-31/index.html
 
 #include <sys/types.h>
 #include <sys/wait.h>
