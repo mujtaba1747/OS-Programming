@@ -2,7 +2,7 @@
 // Author : Syed Mujtaba 
 // TE - 11
 // Compile using gcc file.c -lpthread
-// http://p.ip.fi/RrAY
+// http://p.ip.fi/ElZ2
 // Refer : https://docs.oracle.com/cd/E19455-01/806-5257/sync-31/index.html
 
 #include <sys/types.h>
@@ -14,8 +14,8 @@
 #include <assert.h>
 #include <pthread.h>
 #include <semaphore.h>
-void * producer(void *arg);
-void * consumer(void *arg);
+void* producer(void *arg);
+void* consumer(void *arg);
 
 typedef struct 
 {
@@ -39,9 +39,11 @@ int main()
 	srand(time(0));
 	printf("Enter size of Buffer : ");
 	scanf("%d", &P.n);
+	assert(P.n > 0);
 
 	printf("Enter the number of Iterations : ");
 	scanf("%d", &P.max);
+	assert(P.max > 0);
 
 	P.buffer = (int *)malloc(P.n * sizeof(int));
 
@@ -92,27 +94,31 @@ void* producer(void *arg)
 	while(1)
 	{
 		sem_wait(&(((Buffer *)(arg)) -> empty));
-		pthread_mutex_lock(&(((Buffer *)(arg)) -> mu));
+		pthread_mutex_lock(&(((Buffer *)(arg)) -> mu)); // Entering Critical Section 
 
 		int idx = ((Buffer *)(arg)) -> in;
 		(((Buffer *)(arg)) -> buffer)[idx] = (rand() % 15);
 		printf("%d is being inserted\n", (((Buffer *)(arg)) -> buffer)[idx]); 
-		((Buffer *)(arg)) -> in = (((Buffer *)(arg))-> in + 1)%(((Buffer *)(arg)) -> n);
+		((Buffer *)(arg)) -> in = (((Buffer *)(arg))-> in + 1)%(((Buffer *)(arg))->n + 1);
 		((Buffer *)(arg)) -> co = (((Buffer *)(arg))-> co + 1);
-
+	
 		sem_post(&(((Buffer *)(arg)) -> full));
-		pthread_mutex_unlock(&(((Buffer *)(arg)) -> mu));
 
+		printf("%d - %d", ((Buffer *)(arg)) -> out, ((Buffer *)(arg)) -> in);
 		printf("Buffer State : \n");
-		for(int i = ((Buffer *)(arg)) -> out; i != ((Buffer *)(arg)) -> in; i = (i + 1) % (((Buffer *)(arg)) -> n))
+		for(int i = ((Buffer *)(arg)) -> out; i != ((Buffer *)(arg)) -> in; i = (i + 1) % (((Buffer *)(arg)) -> n + 1))
 			printf("%d ", (((Buffer *)(arg)) -> buffer)[i]);
 		printf("\n");
+
+		pthread_mutex_unlock(&(((Buffer *)(arg)) -> mu)); // Leaving Critical Section
 		
 		if(((Buffer *)(arg)) -> co >= ((Buffer *)(arg)) -> max)
 			break;
-
-		float sleeper = ((float)(rand() % 10)) / 10.00;
-		sleep(sleeper);
+		if(rand() % 2) // Doing a random sleep to demonstrate Process Synchronization
+		{
+			float sleeper = rand()%20 / 10.00;
+			sleep(sleeper);
+		}
 	}
 	pthread_exit((void *)(NULL));
 }
@@ -121,27 +127,31 @@ void* consumer(void *arg)
 	while(1)
 	{
 		sem_wait(&(((Buffer *)(arg)) -> full));
-		pthread_mutex_lock(&(((Buffer *)(arg)) -> mu));
+		pthread_mutex_lock(&(((Buffer *)(arg)) -> mu)); // Entering Critical Section
 
 		int idx = ((Buffer *)(arg)) -> out;
 		int ele = (((Buffer *)(arg)) -> buffer)[idx];
 		printf("%d is being consumed\n", ele); 
-		((Buffer *)(arg)) -> out = (((Buffer *)(arg))->out + 1)%(((Buffer *)(arg)) -> n);
+		((Buffer *)(arg)) -> out = (((Buffer *)(arg))->out + 1)%(((Buffer *)(arg))->n + 1);
 		((Buffer *)(arg)) -> co = (((Buffer *)(arg))->co + 1);
 
 		sem_post(&(((Buffer *)(arg)) -> empty));
-		pthread_mutex_unlock(&(((Buffer *)(arg)) -> mu));
 
 		printf("Buffer State : \n");
-		for(int i = ((Buffer *)(arg)) -> out; i != ((Buffer *)(arg)) -> in; i = (i + 1) % (((Buffer *)(arg)) -> n))
+		for(int i = ((Buffer *)(arg)) -> out; i != ((Buffer *)(arg)) -> in; i = (i + 1) % (((Buffer *)(arg)) -> n + 1))
 			printf("%d ", (((Buffer *)(arg)) -> buffer)[i]);
 		printf("\n");
 
+		pthread_mutex_unlock(&(((Buffer *)(arg)) -> mu)); // Leaving Critical Section
+
 		if(((Buffer *)(arg)) -> co >= ((Buffer *)(arg)) -> max)
 			break;
-
-		float sleeper = ((float)(rand() % 12)) / 10.00;
-		sleep(sleeper);
+		if(rand() % 2) // Doing a random sleep to demonstrate Process Synchronization
+		{
+			float sleeper = ((rand() % 20))/10.00;
+			sleep(sleeper);
+		}
 	}
 	pthread_exit((void *)(NULL));
 }
+
