@@ -2,7 +2,7 @@
 // TE-11
 // Dining Philosophers using Semaphores
 // Compile using -lpthread flag
-// http://p.ip.fi/RxxF
+// http://p.ip.fi/p8MF
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <stdio.h>
@@ -60,13 +60,7 @@ void* phil_fun(void *arg)
 	int i = *(int *)(arg);
 	printf("Philosopher%d is Thinking\n", i);
 	sleep(1);
-	// if(i == 1)
-	// {
-	// 	sem_wait(&foo[i]);
-	// 	printf("Philosopher%d is Hungry, he wants Chopstick%d \n", i, (i+1)%N);
-	// 	sem_wait(&foo[(i+1)%N]);	
-	// }
-	if(rand() % 2 && i == 0) // Deadlock Avoidance
+	if(i == 0) // Deadlock Avoidance - Making i=0 the wierdo // Can randomize weirdness in philosophers also
 	{
 		sem_wait(&foo[i]);
 		printf("Philosopher%d is Hungry\n", i);
